@@ -1,3 +1,22 @@
+### ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ###
+### ~~~~~~~~~~~~~ Programmer: Aaron "A.J." Cassell. (@BrotatoBoi) ~~~~~~~~~ ###
+### ~~~~~~~~~~~~~~~~~~~~~~ Program Name: Game of Life. ~~~~~~~~~~~~~~~~~~~~ ###
+### ~~~~~~~ Description: A recreation of Conway's Game of Life using ~~~~~~ ###
+### ~~~~~~~ Quantum Computing for selection of the state of the Cell. ~~~~~ ###
+### ~~~~~~~~~~~~~~~~~~~~~~~~~~ File: Quantum.py ~~~~~~~~~~~~~~~~~~~~~~~~~~~ ###
+### ~~~~~~~~~~~~~~~~~~~~~~~~~~ Date: 2025/10/09 ~~~~~~~~~~~~~~~~~~~~~~~~~~~ ###
+### ~~~~~~~~~~~~~~~~~~~~~~~ Version: 2.3-2025.10.13 ~~~~~~~~~~~~~~~~~~~~~~~ ###
+### ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ###
+
+### ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ###
+### ~~~~~~~~~~~~~~~~~~~~~~ Copyright (C) 2025 BrotatoBoi ~~~~~~~~~~~~~~~~~~ ###
+### ~~~~ This program is free software: you can redistribute it and/or ~~~~ ###
+### ~~ it under the terms of the GNU General Public License as published ~~ ###
+### ~~~~ by: The Free Software Foundation, either the version 3 of the ~~~~ ###
+### ~~~~~~~~~~~~~~~~~~~~ License, or any later version. ~~~~~~~~~~~~~~~~~~~ ###
+### ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ###
+
+
 from qiskit import QuantumCircuit, transpile
 from qiskit_aer import AerSimulator
 import math
@@ -37,17 +56,33 @@ class QuantumMechanics:
 
         return result.get_memory()[0]
 
-    def q_choice(self, options):
+    def q_choice(self, options, weights=None):
         choices = len(options)
 
         if choices == 0:
             raise ValueError("Choices can not be empty!")
 
+        if weights is None:
+            weights = [1]*choices
+        elif len(weights) > choices:
+            raise ValueError("Cannot be more weights than choices!")
+
+        total = sum(weights)
+        cumWeights = []
+        cumSum = 0
+
+        for weight in weights:
+            cumSum += weight
+            cumWeights.append(cumSum)
+
         qbits = math.ceil(math.log2(choices))
 
-        result = self._run_circuit(qbits)
+        result = int(self._run_circuit(qbits), 2)%total
         
-        return options[int(result)%choices]
+        for i, cum in enumerate(cumWeights):
+            if result < cum:
+                return options[i]
+                
 
     def q_flip(self, amount=1):
         maxQbits = 29

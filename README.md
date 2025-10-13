@@ -1,6 +1,8 @@
 # The Game of Life: Quantum Edition.
 A recreation of Conway's Game of Life that utilizes quantum randomness to determine each cell's initial state!
 
+# Current Version: V2.5-2025.10.13
+
 # Requirements:
   * python==3.13.7
   * qiskit==2.2.1
@@ -37,4 +39,4 @@ Why Quantum Randomness Instead of Classical?
 To see project updates check the [CHANGELOG](Docs/CHANGELOG.md)
 
 # License
-This project is under the **GNU General Public License v3.0 (GPLv3)**. to see more visit the [LICENSE](LICENSE.md)
+This project is protected under the **GNU General Public License v3.0 (GPLv3)**. to see more visit the [LICENSE](LICENSE)

@@ -1,20 +1,20 @@
-### ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ###
-### ~~~~~~~~~~~~~ Programmer: Aaron "A.J." Cassell. (@BrotatoBoi) ~~~~~~~~~~~~ ###
-### ~~~~~~~~~~~~~~~~~~~~~~ Program Name: Game of Life. ~~~~~~~~~~~~~~~~~~~~~~~ ###
-### ~~~~~~~~ Description: A recreation of Conway's Game of Life using ~~~~~~~~ ###
-### ~~~~~~~~~ Quantum Computing for selection of the state of the Cell. ~~~~~~ ###
-### ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ File: Main.py ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ###
-### ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Date: 2025/10/09 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ###
-### ~~~~~~~~~~~~~~~~~~~~~~~~~ Version: 2.1-2025.10.12 ~~~~~~~~~~~~~~~~~~~~~~~~ ###
-### ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ###
+### ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ###
+### ~~~~~~~~~~~~~ Programmer: Aaron "A.J." Cassell. (@BrotatoBoi) ~~~~~~~~~ ###
+### ~~~~~~~~~~~~~~~~~~~~~~ Program Name: Game of Life. ~~~~~~~~~~~~~~~~~~~~ ###
+### ~~~~~~~ Description: A recreation of Conway's Game of Life using ~~~~~~ ###
+### ~~~~~~~ Quantum Computing for selection of the state of the Cell. ~~~~~ ###
+### ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ File: Main.py ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ###
+### ~~~~~~~~~~~~~~~~~~~~~~~~~~ Date: 2025/10/09 ~~~~~~~~~~~~~~~~~~~~~~~~~~~ ###
+### ~~~~~~~~~~~~~~~~~~~~~~~ Version: 2.3-2025.10.13 ~~~~~~~~~~~~~~~~~~~~~~~ ###
+### ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ###
 
-### ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ###
-### ~~~~~~~~~~~~~~~~~~~~~~ Copyright (C) 2025 BrotatoBoi ~~~~~~~~~~~~~~~~~~~~~ ###
-### ~ This program is free software: you can redistribute it and/or modify ~~~ ###
-### ~ it under the terms of the GNU General Public License as  published by: ~ ###
-### ~ the Free Software Foundation, either the version 3 of the License, or ~~ ###
-### ~~~~~~~~~~~~~~~~~~~~~~~~~~~ any later version. ~~~~~~~~~~~~~~~~~~~~~~~~~~~ ###
-### ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ###
+### ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ###
+### ~~~~~~~~~~~~~~~~~~~~~~ Copyright (C) 2025 BrotatoBoi ~~~~~~~~~~~~~~~~~~ ###
+### ~~~~ This program is free software: you can redistribute it and/or ~~~~ ###
+### ~~ it under the terms of the GNU General Public License as published ~~ ###
+### ~~~~ by: The Free Software Foundation, either the version 3 of the ~~~~ ###
+### ~~~~~~~~~~~~~~~~~~~~ License, or any later version. ~~~~~~~~~~~~~~~~~~~ ###
+### ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ###
 
 
 # ~ Import Needed Libraries. ~ #
@@ -41,30 +41,27 @@ class Main:
             Initialize all of the programs variables.
 
             Variables:
-                self.world          : The object for the world class.
-                self._isRunning     :  Boolean to check the state of the program.
+                self.world        : The object for the world class.
+                self._isRunning   :  Boolean to check the state of the program.
         """
 
-        if renderType == 'text':
-            termSize = os.get_terminal_size()
-            width = termSize.columns
-            height = termSize.lines
-
-        elif renderType == 'gui':
-            import pygame as pg
-            
-            pg.init()
-            # Handle this error
-            cellSize = int(input("How many pixels should the cell be? (e.g.: 5 = 5x5) >>> "))
-
-            self.window = GUI.Window(self, cellSize) ## CREATE THIS CLASS
-
-            width = self.window.width//cellSize
-            height = self.window.height//cellSize
+        termSize = os.get_terminal_size()
+        self.width, self.height = (termSize.columns, termSize.lines)
 
         self.renderType = renderType
-        self.world = w.World(width, height)
+        self.world = w.World(self.width, self.height)
         self._isRunning = True
+        self._guiIsInit = False
+
+    def init_gui(self):
+        import pygame as pg
+        
+        pg.init()
+        # Handle this error
+
+        self.window = GUI.Window((self.width, self.height), self)
+
+        self._guiIsInit = True
 
     def kill(self):
         self._isRunning = False
@@ -110,16 +107,22 @@ class Main:
         """
 
         while self._isRunning:
-            if self.renderType == "text":
-                self.render_text()
-            elif self.renderType == "gui":
-                self.render_gui()
+            if self.world.isLoaded:
+                if self.renderType == "text":
+                    self.render_text()
+                elif self.renderType == "gui":
+                    if not self._guiIsInit:
+                        self.init_gui()
+                    self.render_gui()
 
 
 # ~ Check if this is the main program. ~ #
 if __name__ == '__main__':
-    print("Welcome to The Game of Life: Quantum Edition!")
-    print("How do you want it to be rendered?\n\t1) Text-Based\n\t2) Graphical G.U.I")
+    print("""
+            Welcome to The Game of Life: Quantum Edition!
+            How do you want it to be rendered?
+                1) Text-Based
+                2) Graphical G.U.I""")
     
     attempts = 3
 

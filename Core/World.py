@@ -1,26 +1,28 @@
-### ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ###
-### ~~~~~~~~~~~~~ Programmer: Aaron "A.J." Cassell. (@BrotatoBoi) ~~~~~~~~~~~~ ###
-### ~~~~~~~~~~~~~~~~~~~~~~ Program Name: Game of Life. ~~~~~~~~~~~~~~~~~~~~~~~ ###
-### ~~~~~~~~ Description: A recreation of Conway's Game of Life using ~~~~~~~~ ###
-### ~~~~~~~~~ Quantum Computing for selection of the state of the Cell. ~~~~~~ ###
-### ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ File: World.py ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ###
-### ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Date: 2025/10/09 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ###
-### ~~~~~~~~~~~~~~~~~~~~~~~~~ Version: 2.1-2025.10.12 ~~~~~~~~~~~~~~~~~~~~~~~~ ###
-### ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ###
+### ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ###
+### ~~~~~~~~~~~~~ Programmer: Aaron "A.J." Cassell. (@BrotatoBoi) ~~~~~~~~~ ###
+### ~~~~~~~~~~~~~~~~~~~~~~ Program Name: Game of Life. ~~~~~~~~~~~~~~~~~~~~ ###
+### ~~~~~~~ Description: A recreation of Conway's Game of Life using ~~~~~~ ###
+### ~~~~~~~ Quantum Computing for selection of the state of the Cell. ~~~~~ ###
+### ~~~~~~~~~~~~~~~~~~~~~~~~~~~ File: World.py ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ###
+### ~~~~~~~~~~~~~~~~~~~~~~~~~~ Date: 2025/10/09 ~~~~~~~~~~~~~~~~~~~~~~~~~~~ ###
+### ~~~~~~~~~~~~~~~~~~~~~~~ Version: 2.5-2025.10.13 ~~~~~~~~~~~~~~~~~~~~~~~ ###
+### ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ###
 
-### ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ###
-### ~~~~~~~~~~~~~~~~~~~~~~ Copyright (C) 2025 BrotatoBoi ~~~~~~~~~~~~~~~~~~~~~ ###
-### ~ This program is free software: you can redistribute it and/or modify ~~~ ###
-### ~ it under the terms of the GNU General Public License as  published by: ~ ###
-### ~ the Free Software Foundation, either the version 3 of the License, or ~~ ###
-### ~~~~~~~~~~~~~~~~~~~~~~~~~~~ any later version. ~~~~~~~~~~~~~~~~~~~~~~~~~~~ ###
-### ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ###
+### ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ###
+### ~~~~~~~~~~~~~~~~~~~~~~ Copyright (C) 2025 BrotatoBoi ~~~~~~~~~~~~~~~~~~ ###
+### ~~~~ This program is free software: you can redistribute it and/or ~~~~ ###
+### ~~ it under the terms of the GNU General Public License as published ~~ ###
+### ~~~~ by: The Free Software Foundation, either the version 3 of the ~~~~ ###
+### ~~~~~~~~~~~~~~~~~~~~ License, or any later version. ~~~~~~~~~~~~~~~~~~~ ###
+### ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ###
 
 
 # ~ Import needed libraries. ~ #
 from qiskit import QuantumCircuit, transpile
 from qiskit_aer import AerSimulator
 from threading import Thread
+import os, time
+from concurrent.futures import ProcessPoolExecutor, as_completed
 from queue import Queue
 
 # ~ Import custom Modules. ~ #
@@ -77,7 +79,8 @@ class Cell:
 
             Variables:
                 color : The color based on the state of the Cell.
-                char  : The character to display based on the state of the Cell.
+                char  : The character to display based on the state 
+                        of the Cell.
         """
 
         if self.state:
@@ -120,9 +123,24 @@ class World:
         self.qm = q.QuantumMechanics()
         self.width = width
         self.height = height
+
+        self.states = [[0]*self.width for _ in range(self.height)]
         self.isLoaded = False
-        self.cells = [[Cell(x, y, 0) for x in range(self.width)] for y in range(self.height)]
-        self.newCells = [[Cell(x, y, 0) for x in range(self.width)] for y in range(self.height)]
+
+        Thread(target=self.init_states, daemon=True).start()
+
+        while not self.isLoaded:
+            os.system("clear")
+
+            for y in range(self.height):
+                row = "".join("█" if cell else "." for cell in self.states[y])
+                print(row)
+            time.sleep(0.1)
+
+        self.cells = [[Cell(x, y, self.states[y][x]) for x in range(width)]
+                        for y in range(height)]
+        self.newCells = [[Cell(x, y, 0) for x in range(width)] 
+                        for y in range(height)]
         self.q = Queue()
 
         for _ in range(6):
@@ -133,9 +151,38 @@ class World:
 
         Thread(target=self.pattern_select, daemon=True).start()
 
+    def init_states(self, chunk=10):
+        cells = self.width*self.height
+        self.states = [[0]*self.width for _ in range(self.height)]
+        
+        def worker(start):
+            end = min(start+chunk, self.height)
+
+            for y in range(start, end):
+                bits = self.qm.q_flip(self.width)
+                self.states[y] = bits
+
+            print(f"Initialized rows {start+1}-{end}/{self.height}")
+
+        threads = []
+
+        for start in range(0, self.height, chunk):
+            t = Thread(target=worker, args=(start,))
+            t.start()
+            threads.append(t)
+
+        for t in threads:
+            t.join()
+
+        self.isLoaded = True
+
+        print("World state initialized!")
+
     def pattern_select(self):
+        weights = [5, 1, 1]
         while True:
-            pattern = PATTERNS[self.qm.q_choice(list(PATTERNS.keys()))]
+            pattern = self.qm.q_choice(list(PATTERNS.keys()), weights)
+            pattern = PATTERNS[pattern]
             x = self.qm.q_randint(self.width-1, 0)
             y = self.qm.q_randint(self.height-1, 0)
 
@@ -177,7 +224,7 @@ class World:
 
             self.cells[y][x].state = 1
 
-    def check_neighbors(self, cell):
+    def check_cells(self, cell):
         """
             Check all of the neighbors of a cell.
 
@@ -234,12 +281,12 @@ class World:
         for y in range(self.height):
             for x in  range(self.width):
                 cell = self.cells[y][x]
-                liveCells = sum(1 for neighbor in self.check_neighbors(cell) if neighbor.state)
+                live = sum(1 for c in self.check_cells(cell) if c.state)
                 newState = cell.state
 
-                if cell.state and (liveCells < 2 or liveCells > 3):
+                if cell.state and (live < 2 or live > 3):
                         newState = 0
-                elif not cell.state and liveCells == 3:
+                elif not cell.state and live == 3:
                         newState = 1
 
                 self.newCells[y][x].state = newState
