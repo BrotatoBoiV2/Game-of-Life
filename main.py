@@ -24,8 +24,8 @@ import time
 import os
 
 # ~ Custom modules. ~ #
-from Core import World as w
-from Core import GUI
+from core import world
+from core import gui
 
 
 class Main:
@@ -61,7 +61,7 @@ class Main:
         self.width, self.height = term_size.columns, term_size.lines
 
         self.render_type = render_type
-        self.world = w.World(self.width, self.height)
+        self.world = world.World(self.width, self.height)
         self._running = True
         self._gui_init = False
 
@@ -72,7 +72,7 @@ class Main:
         
         pg.init()
 
-        self.window = GUI.Window((self.width, self.height), self)
+        self.window = gui.Window((self.width, self.height), self)
         self._gui_init = True
 
     def kill(self):

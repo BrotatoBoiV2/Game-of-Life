@@ -34,7 +34,7 @@ from qiskit_aer import AerSimulator
 from colorama import Fore, Style, init
 
 # ~ Custom modules. ~ #
-from Core import Quantum as q
+from core import quantum as q
 
 
 # ~ Initialize GLOBAL Variables. ~ #
