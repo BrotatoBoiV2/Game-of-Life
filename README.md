@@ -41,7 +41,7 @@ python3 main.py
   * Extensible for custom patterns or "immortal" cells.
 
 ## Demo:
-Demo video in progress.
+![Here](https://youtu.be/oJUv5a1jjpE) is the demo video.
 
 ## Why Quantum Randomness?
     I figured it would be interesting to rewrite an old project with a newer concept! Each cell uses a single-qubit Hadamard gate to determine its initial state (alive or dead), introducing true quantum randomness rather than relying on classical pseudorandom generators.
