@@ -124,6 +124,7 @@ class Main:
 
 
 if __name__ == '__main__':
+    os.system('clear') # TODO: Make a helper function for cross-platform.
     # TODO: Consider adding a menu function  for cleaner input handling.
     print("""
 Welcome to The Game of Life: Quantum Edition!
