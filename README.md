@@ -1,7 +1,10 @@
 ## The Game of Life: Quantum Edition
-A recreation of Conway's Game of Life that utilizes quantum randomness to determine each cell's initial state!
 
-## Current Version: V2.5-2025.10.13
+## Description:
+A Python recreation of Conway’s Game of Life that uses **quantum randomness** to determine each cell’s initial state.
+
+## Current Version: 
+**V2.5 - 2025.10.13**
 
 ## Requirements:
   * python==3.13.7
@@ -10,20 +13,20 @@ A recreation of Conway's Game of Life that utilizes quantum randomness to determ
   * colorama==0.4.6
   * pygame==2.6.1
 
-## Installation:
-  In the project file run the following commands:
+## Installation and Quickstart:
+In the project directory run the following commands:
 
-```bash
-python3 -m venv ./venv
-. ./venv/bin/activate
-pip install -r requirements.txt
-```
-
-## Quickrun:
 ```bash
 git clone https://github.com/BrotatoBoiV2/Game-of-Life
 cd Game-of-Life
-python3 main.py
+python3 -m venv ./life
+. ./life/bin/activate
+pip install -r requirements.txt
+```
+Then run:
+
+```bash
+python3 ./main.py
 ```
 
 
@@ -42,13 +45,17 @@ python3 main.py
   * Extensible for custom patterns or "immortal" cells.
 
 ## Demo:
-Demo video in progress.
+[![Thumbnail of YouTube Demo video](assets/thumbnail.png)](https://www.youtube.com/watch?v=oJUv5a1jjpE)
 
 ## Why Quantum Randomness?
-    I figured it would be interesting to rewrite an old project with a newer concept! Each cell uses a single-qubit Hadamard gate to determine its initial state (alive or dead), introducing true quantum randomness rather than relying on classical pseudorandom generators.
+ Each cell’s initial state (alive or dead) is determined by a single-qubit Hadamard gate, introducing true quantum randomness through Qiskit rather than relying on classical pseudorandom generators.
 
 ## Updates:
-To see project updates check the [CHANGELOG](docs/CHANGELOG.md)
+For detailed update history, see the [CHANGELOG](docs/CHANGELOG.md)
 
 ## License:
 This project is protected under the **GNU General Public License v3.0 (GPLv3)**. To see more, visit the [LICENSE](LICENSE)
+
+---
+
+**If you like this project, consider giving it a star.**
