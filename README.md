@@ -8,6 +8,7 @@ A recreation of Conway's Game of Life that utilizes quantum randomness to determ
   * qiskit==2.2.1
   * qiskit-aer==0.17.2
   * colorama==0.4.6
+  * pygame==2.6.1
 
 ## Installation:
   In the project file run the following commands:
