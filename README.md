@@ -1,4 +1,4 @@
-## The Game of Life: Quantum Edition.
+## The Game of Life: Quantum Edition
 A recreation of Conway's Game of Life that utilizes quantum randomness to determine each cell's initial state!
 
 ## Current Version: V2.5-2025.10.13
@@ -12,10 +12,17 @@ A recreation of Conway's Game of Life that utilizes quantum randomness to determ
 ## Installation:
   In the project file run the following commands:
 
-```
+```bash
 python3 -m venv ./venv
 . ./venv/bin/activate
 pip install -r requirements.txt
+```
+
+## Quickrun:
+```bash
+git clone https://github.com/BrotatoBoiV2/Game-of-Life
+cd Game-of-Life
+python3 main.py
 ```
 
 
@@ -32,6 +39,9 @@ pip install -r requirements.txt
   * Support for oscillators, gliders, and still lifes.
   * Toroidal grid wrapping to prevent edge stagnation.
   * Extensible for custom patterns or "immortal" cells.
+
+## Demo:
+Demo video in progress.
 
 ## Why Quantum Randomness?
     I figured it would be interesting to rewrite an old project with a newer concept! Each cell uses a single-qubit Hadamard gate to determine its initial state (alive or dead), introducing true quantum randomness rather than relying on classical pseudorandom generators.
